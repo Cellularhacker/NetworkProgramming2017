@@ -24,11 +24,11 @@ int main(void) {
     char buf[] = "Let's go!\n";
 
     fd = open("data.txt", O_CREAT|O_WRONLY|O_TRUNC);
-    if(fd == -1)
+    if(fd == -1)    // Failed to get a new File Descriptor.
         error_handling("open() error!");
     printf("file descriptor: %d \n", fd);
 
-    if(write(fd, buf, sizeof(buf)) == -1)
+    if(write(fd, buf, sizeof(buf)) == -1)   // Failed to write the content by using the File Descriptor.
         error_handling("write() error!");
     
     // Closing the File Descriptor.
