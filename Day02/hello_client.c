@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     }
 
     sock = socket(PF_INET, SOCK_STREAM, 0);
-    if(sock == -1) // Failed to getting a new File Descripter.
+    if(sock == -1) // Failed to getting a new File Descriptor.
         error_handling("socket() error");
 
     memset(&serv_addr, 0, sizeof(serv_addr));
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
         error_handling("connect() error");
 
     str_len = read(sock, message, sizeof(message) -1);
-    if(str_len == -1)   // Failed to receive a message from Socket Descripter.
+    if(str_len == -1)   // Failed to receive a message from Socket Descriptor.
         error_handling("read() error");
     
     printf("Message from server : %s \n", message);

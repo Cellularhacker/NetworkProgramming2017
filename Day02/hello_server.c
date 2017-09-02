@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     }
 
     serv_sock = socket(PF_INET, SOCK_STREAM, 0);
-    if(serv_sock == -1) // Failed to getting a new File Descripter.
+    if(serv_sock == -1) // Failed to getting a new File Descriptor.
         error_handling("socket() error");
 
     memset(&serv_addr, 0, sizeof(serv_addr));
@@ -45,10 +45,10 @@ int main(int argc, char *argv[]) {
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port = htons(atoi(argv[1]));
 
-    if(bind(serv_sock, (struct sockaddr*) & serv_addr, sizeof(serv_addr)) == -1)    // Failed to bind into the Socket Descripter.
+    if(bind(serv_sock, (struct sockaddr*) & serv_addr, sizeof(serv_addr)) == -1)    // Failed to bind into the Socket Descriptor.
         error_handling("bind() error");
     
-    if(listen(serv_sock, 5) == -1)  // Failed to listen on the new Socket Descripter.
+    if(listen(serv_sock, 5) == -1)  // Failed to listen on the new Socket Descriptor.
         error_handling("listen() error");
 
     clnt_addr_size = sizeof(clnt_addr);
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
     if(clnt_sock == -1) // Failed to accept a connection from a new client
         error_handling("accept() error");
     
-        // Sending a new Message to the client by using the Socket Descripter
+        // Sending a new Message to the client by using the Socket Descriptor
         write(clnt_sock, message, sizeof(message));
 
         // Closing Sockets
