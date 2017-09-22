@@ -41,6 +41,7 @@ int main(int argc, char *argv[]) {
     while(1) {
         clnt_adr_sz = sizeof(clnt_adr);
         str_len = recvfrom(serv_sock, message, BUF_SIZE, 0, (struct sockaddr*)&clnt_adr, &clnt_adr_sz);
+        printf("Client : %u (%d) => %s\n", clnt_adr.sin_addr.s_addr, clnt_adr.sin_port, message);
         sendto(serv_sock, message, str_len, 0, (struct sockaddr*)&clnt_adr, clnt_adr_sz);
     }
 
