@@ -42,7 +42,6 @@ int main(int argc, char *argv[]) {
     int serv_sock, clnt_sock;
     struct data_packet d_pack; //Using the struct instead of opmsg[] and op_cnt.
     int result, i;
-    int recv_cnt, recv_len;
     struct sockaddr_in serv_adr, clnt_adr;
     socklen_t clnt_adr_sz;
 
@@ -53,8 +52,8 @@ int main(int argc, char *argv[]) {
     }
 
     // socket();
-    sock = socket(PF_INET, SOCK_STREAM, 0);
-    if(sock == -1)
+    serv_sock = socket(PF_INET, SOCK_STREAM, 0);
+    if(serv_sock == -1)
         error_handling("socket() error");
 
     memset(&serv_adr, 0, sizeof(serv_adr));
@@ -73,19 +72,22 @@ int main(int argc, char *argv[]) {
     clnt_adr_sz = sizeof(clnt_adr);
 
     for(i=0; i<5; i++) {
-        opnd_cnt = 0;
         // accept();
         clnt_sock = accept(serv_sock, (struct sockaddr*)&clnt_adr, &clnt_adr_sz);
-        read(clnt_sock, &opnd_cnt, 1);
 
-        recv_len = 0;
-        while( sizeof(d_pack) > recv_len ) {
-            recv_cnt = read(clnt_sock, &d_pack.operand[recv_len], BUF_SIZE-1);
-            recv_len += recv_cnt;
-        }
+        // Showing the information of the client connected.
+        printf("[Client %d] has been connected! (socket: %d, IP: %u, port: %hu)\n",
+            i, clnt_sock, ntohl(clnt_adr.sin_addr.s_addr), ntohs(clnt_adr.sin_port));
+        //printf("\tsocket: %d, IP: %u, port: %hu", clnt_sock, ntohl(clnt_adr.sin_addr.s_addr), ntohs(clnt_adr.sin_port));
+
+        // Expected the possibility getting broken packets.
+        read(clnt_sock, &d_pack, BUF_SIZE-1);
 
         // Calculating Process
-        result = calculate(opnd_cnt, (int*)&result, szieof(result));
+        result = calculate(d_pack.op_num, d_pack.operand, d_pack.op_code);
+
+        // Sending the result of calculating requested from the client.
+        write(clnt_sock, &result, sizeof(result));
 
         // Closing the socket connected with the client
         close(clnt_sock);
@@ -107,17 +109,17 @@ void error_handling(char *message) {
     exit(1);
 }
 
-int calculate(int opnum, int opnds[], char operator) {
+int calculate(int opnum, int opnds[], char op) {
     int result = opnds[0], i;
     switch(op) {
         case '+':
-            for(i=1; i<opnum, i++) result += opnds[i];
+            for(i=1; i<opnum; i++) result += opnds[i];
             break;
         case '-':
-            for(i=1; i<opnum, i++) result -= opnds[i];
+            for(i=1; i<opnum; i++) result -= opnds[i];
             break;
         case '*':
-            for(i=1; i<opnum, i++) result *= opnds[i];
+            for(i=1; i<opnum; i++) result *= opnds[i];
             break;
     }
 

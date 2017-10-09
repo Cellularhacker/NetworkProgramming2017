@@ -76,13 +76,13 @@ int main(int argc, char *argv[]) {
 
     for(i=0; i<d_pack.op_num; i++) {
         printf("Operand %d: ", i+1);
-        scanf("%d", d_pack.operand[i]);
+        scanf("%d", &d_pack.operand[i]);
     }
 
     fgetc(stdin);
     fputs("Operator: ", stdout);
     scanf("%c", &d_pack.op_code);
-    write(sock, (char*)&d_pack, sizeof(d_pack));
+    write(sock, &d_pack, sizeof(d_pack));
     read(sock, &result, RLT_SIZE);
 
     printf("Operation result: %d \n", result);
