@@ -30,7 +30,7 @@ void error_handling(char *message);
 //
 int main(int argc, char *argv[]) {
     int sock;
-    char opmsg[BUF_SIZE];
+    char opinfo[BUF_SIZE];
     int result, opnd_cnt, i;
     struct sockaddr_in serv_adr;
 
@@ -56,17 +56,17 @@ int main(int argc, char *argv[]) {
 
     fputs("Operand count: ", stdout);
     scanf("%d", &opnd_cnt);
-    opmsg[0] = (char)opnd_cnt;
+    opinfo[0] = (char)opnd_cnt;
 
     for(i=0; i<opnd_cnt; i++) {
         printf("Operand %d: ", i+1);
-        scanf("%d", (int*)&opmsg[i*OPSZ+1]);
+        scanf("%d", (int*)&opinfo[i*OPSZ+1]);
     }
 
     fgetc(stdin);
     fputs("Operator: ", stdout);
-    scanf("%c", &opmsg[opnd_cnt*OPSZ+1]);
-    write(sock, opmsg, opnd_cnt*OPSZ+2);
+    scanf("%c", &opinfo[opnd_cnt*OPSZ+1]);
+    write(sock, opinfo, opnd_cnt*OPSZ+2);
     read(sock, &result, RLT_SIZE);
 
     printf("Operation result: %d \n", result);
