@@ -16,7 +16,6 @@
 //
 #define BUF_SIZE 1024
 #define RLT_SIZE 4
-#define OPSZ 4
 
 
 //
@@ -26,12 +25,21 @@ void error_handling(char *message);
 
 
 //
+// Definition of struct
+//
+struct data_packet {
+    int op_num;
+    char op_code;
+    int operand[30];
+};
+
+//
 // Main Function
 //
 int main(int argc, char *argv[]) {
     int sock;
-    char opmsg[BUF_SIZE];
-    int result, opnd_cnt, i;
+    struct data_packet d_pack; //Using the struct instead of opmsg[] and op_cnt.
+    int result, i;
     struct sockaddr_in serv_adr;
 
     // This application requires 3 parameters
@@ -55,18 +63,26 @@ int main(int argc, char *argv[]) {
         puts("Connected..........");
 
     fputs("Operand count: ", stdout);
-    scanf("%d", &opnd_cnt);
-    opmsg[0] = (char)opnd_cnt;
 
-    for(i=0; i<opnd_cnt; i++) {
+    // Clearing the memory space allocated in data_packet struct.
+    memset(&d_pack, 0, sizeof(d_pack));
+    while(1) {
+        scanf("%d", &d_pack.op_num);
+        if(d_pack.op_num > 30 || d_pack.op_num < 2)
+            printf("It must be 2 to 30 numbers");
+        else
+            break;
+    }
+
+    for(i=0; i<d_pack.op_num; i++) {
         printf("Operand %d: ", i+1);
-        scanf("%d", (int*)&opmsg[i*OPSZ+1]);
+        scanf("%d", d_pack.operand[i]);
     }
 
     fgetc(stdin);
     fputs("Operator: ", stdout);
-    scanf("%c", &opmsg[opnd_cnt*OPSZ+1]);
-    write(sock, opmsg, opnd_cnt*OPSZ+2);
+    scanf("%c", &d_pack.op_code);
+    write(sock, (char*)&d_pack, sizeof(d_pack));
     read(sock, &result, RLT_SIZE);
 
     printf("Operation result: %d \n", result);

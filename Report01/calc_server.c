@@ -16,7 +16,6 @@
 //
 #define BUF_SIZE 1024
 #define RLT_SIZE 4
-#define OPSZ 4
 
 
 //
@@ -25,13 +24,24 @@
 void error_handling(char *message);
 int calculate(int opnum, int opnds[], char operator);
 
+
+//
+// Definition of struct
+//
+struct data_packet {
+    int op_num;
+    char op_code;
+    int operand[30];
+};
+
+
 //
 // Main Function
 //
 int main(int argc, char *argv[]) {
     int serv_sock, clnt_sock;
-    char opmsg[BUF_SIZE];
-    int result, opnd_cnt, i;
+    struct data_packet d_pack; //Using the struct instead of opmsg[] and op_cnt.
+    int result, i;
     int recv_cnt, recv_len;
     struct sockaddr_in serv_adr, clnt_adr;
     socklen_t clnt_adr_sz;
@@ -69,8 +79,8 @@ int main(int argc, char *argv[]) {
         read(clnt_sock, &opnd_cnt, 1);
 
         recv_len = 0;
-        while( (opnd_cnt*OPSZ+1) > recv_len ) {
-            recv_cnt = read(clnt_sock, &opinfo[recv_len], BUF_SIZE-1);
+        while( sizeof(d_pack) > recv_len ) {
+            recv_cnt = read(clnt_sock, &d_pack.operand[recv_len], BUF_SIZE-1);
             recv_len += recv_cnt;
         }
 
