@@ -14,8 +14,7 @@
 //
 // Definition of Macro constant
 //
-#define BUF_SIZE 1024
-#define RLT_SIZE 4
+//#define BUF_SIZE 128
 
 
 //
@@ -41,7 +40,7 @@ struct data_packet {
 int main(int argc, char *argv[]) {
     int serv_sock, clnt_sock;
     struct data_packet d_pack; //Using the struct instead of opmsg[] and op_cnt.
-    int result, i;
+    int result, i=0;
     struct sockaddr_in serv_adr, clnt_adr;
     socklen_t clnt_adr_sz;
 
@@ -52,7 +51,7 @@ int main(int argc, char *argv[]) {
     }
 
     // socket();
-    serv_sock = socket(PF_INET, SOCK_STREAM, 0);
+    serv_sock = socket(PF_INET, SOCK_DGRAM, 0);
     if(serv_sock == -1)
         error_handling("socket() error");
 
@@ -65,32 +64,26 @@ int main(int argc, char *argv[]) {
     if( bind(serv_sock, (struct sockaddr*)&serv_adr, sizeof(serv_adr)) == -1 )
         error_handling("bind() error");
 
-    // listen();
-    if( listen(serv_sock, 5) == -1 )
-        error_handling("listen() error");
-
     clnt_adr_sz = sizeof(clnt_adr);
 
-    for(i=0; i<5; i++) {
-        // accept();
-        clnt_sock = accept(serv_sock, (struct sockaddr*)&clnt_adr, &clnt_adr_sz);
+    while(1) {
+        // recvfrom(); --> Receiving a data.
+        clnt_adr_sz = sizeof(clnt_adr);
+        recvfrom(serv_sock, &d_pack, sizeof(d_pack), 0, (struct sockaddr*)&clnt_adr, &clnt_adr_sz);
 
-        // Showing the information of the client connected.
-        printf("[Client %d] has been connected! (socket: %d, IP: %u, port: %hu)\n",
+        // Showing the information of the client requested.
+        printf("[Client %d] just requested to calc something! (socket: %d, IP: %u, port: %hu)\n",
             i, clnt_sock, ntohl(clnt_adr.sin_addr.s_addr), ntohs(clnt_adr.sin_port));
         //printf("\tsocket: %d, IP: %u, port: %hu", clnt_sock, ntohl(clnt_adr.sin_addr.s_addr), ntohs(clnt_adr.sin_port));
-
-        // Expected the possibility getting broken packets.
-        read(clnt_sock, &d_pack, BUF_SIZE-1);
 
         // Calculating Process
         result = calculate(d_pack.op_num, d_pack.operand, d_pack.op_code);
 
-        // Sending the result of calculating requested from the client.
-        write(clnt_sock, &result, sizeof(result));
-
-        // Closing the socket connected with the client
-        close(clnt_sock);
+        // sendto(); --> Sending the result of calculating requested from the client.
+        sendto(serv_sock, &result, sizeof(result), 0, (struct sockaddr*)&clnt_adr, clnt_adr_sz);
+        
+        // Increasing the count. This cannot tracking that the client is a same one or not.
+        i++;
     }
 
     // Closing this server's socket
