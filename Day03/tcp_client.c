@@ -6,7 +6,7 @@
 */
 
 // This code is based on Linux.
-#include <stido.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
     int sock;
     struct sockaddr_in serv_addr;
     char message[30];
-    int str_len;
+    int str_len, idx=0;
 
     if(argc != 3) {   // What if it doesn't have 3 parameters at start, Exit the program
         printf("Usage: %s <IP> <port>\n", argv[0]);
@@ -45,11 +45,11 @@ int main(int argc, char *argv[]) {
         error_handling("connect() error");
 
     // Reading by fetching each bytes.
-    while(read_len = read(sock, &message[idx++], 1)) {
-        if(read_len == -1)
+    while(str_len == read(sock, &message[idx++], 1)) {
+        if(str_len == -1)
             error_handling("read() error");
 
-        str_len+=read_len;
+        str_len+=str_len;
     }
     
     printf("Message from server : %s \n", message);
